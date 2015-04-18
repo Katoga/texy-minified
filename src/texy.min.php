@@ -1,18 +1,18 @@
 <?php //netteloader=TexyObject,TexyHtml,TexyModifier,TexyModule,TexyParser,TexyBlockParser,TexyLineParser,TexyUtf,TexyConfigurator,TexyHandlerInvocation,TexyParagraphModule,TexyBlockModule,TexyHeadingModule,TexyHorizLineModule,TexyHtmlModule,TexyFigureModule,TexyImageModule,TexyImage,TexyLinkModule,TexyLink,TexyListModule,TexyLongWordsModule,TexyPhraseModule,TexyBlockQuoteModule,TexyScriptModule,TexyEmoticonModule,TexyTableModule,TexyTableCellElement,TexyTypographyModule,TexyHtmlOutputModule,Texy
 
 /**
- * Texy! - human-readable text to HTML converter.
+ * Texy! is human-readable text to HTML converter (http://texy.info)
  *
- * @copyright  Copyright (c) 2004, 2010 David Grudl
- * @license    GNU GENERAL PUBLIC LICENSE version 2 or 3
- * @link       http://texy.info
- * @package    Texy
+ * Copyright (c) 2004, 2012 David Grudl (http://davidgrudl.com)
+ *
+ * For the full copyright and license information, please view
+ * the file license.txt that was distributed with this source code.
  */
 
-define('TEXY_VERSION','2.1');if(extension_loaded('mbstring')){if(mb_get_info('func_overload')&2&&substr(mb_get_info('internal_encoding'),0,1)==='U'){mb_internal_encoding('pass');trigger_error("Texy: mb_internal_encoding changed to 'pass'",E_USER_WARNING);}}if(ini_get('zend.ze1_compatibility_mode')%
+define('TEXY_VERSION','2.2');if(extension_loaded('mbstring')){if(mb_get_info('func_overload')&2&&substr(mb_get_info('internal_encoding'),0,1)==='U'){mb_internal_encoding('pass');trigger_error("Texy: mb_internal_encoding changed to 'pass'",E_USER_WARNING);}}if(ini_get('zend.ze1_compatibility_mode')%
 256||preg_match('#on$|true$|yes$#iA',ini_get('zend.ze1_compatibility_mode'))){throw
 new
-RuntimeException("Texy cannot run with zend.ze1_compatibility_mode enabled.");}define('TEXY_CHAR','A-Za-z\x{C0}-\x{2FF}\x{370}-\x{1EFF}');define('TEXY_MARK',"\x14-\x1F");define('TEXY_MODIFIER','(?: *(?<= |^)\\.((?:\\([^)\\n]+\\)|\\[[^\\]\\n]+\\]|\\{[^}\\n]+\\}){1,3}?))');define('TEXY_MODIFIER_H','(?: *(?<= |^)\\.((?:\\([^)\\n]+\\)|\\[[^\\]\\n]+\\]|\\{[^}\\n]+\\}|<>|>|=|<){1,4}?))');define('TEXY_MODIFIER_HV','(?: *(?<= |^)\\.((?:\\([^)\\n]+\\)|\\[[^\\]\\n]+\\]|\\{[^}\\n]+\\}|<>|>|=|<|\\^|\\-|\\_){1,5}?))');define('TEXY_IMAGE','\[\* *+([^\n'.TEXY_MARK.']+)'.TEXY_MODIFIER.'? *(\*|(?<!<)>|<)\]');define('TEXY_LINK_URL','(?:\[[^\]\n]+\]|(?!\[)[^\s'.TEXY_MARK.']*?[^:);,.!?\s'.TEXY_MARK.'])');define('TEXY_LINK','(?::('.TEXY_LINK_URL.'))');define('TEXY_LINK_N','(?::('.TEXY_LINK_URL.'|:))');define('TEXY_EMAIL','['.TEXY_CHAR.'][0-9.+_'.TEXY_CHAR.'-]{0,63}@[0-9.+_'.TEXY_CHAR.'\x{ad}-]{1,252}\.['.TEXY_CHAR.'\x{ad}]{2,19}');define('TEXY_URLSCHEME','[a-z][a-z0-9+.-]*:');abstract
+RuntimeException("Texy cannot run with zend.ze1_compatibility_mode enabled.");}define('TEXY_CHAR','A-Za-z\x{C0}-\x{2FF}\x{370}-\x{1EFF}');define('TEXY_MARK',"\x14-\x1F");define('TEXY_MODIFIER','(?: *+(?<= |^)\\.((?:\\([^)\\n]++\\)|\\[[^\\]\\n]++\\]|\\{[^}\\n]++\\}){1,3}?))');define('TEXY_MODIFIER_H','(?: *+(?<= |^)\\.((?:\\([^)\\n]++\\)|\\[[^\\]\\n]++\\]|\\{[^}\\n]++\\}|<>|>|=|<){1,4}?))');define('TEXY_MODIFIER_HV','(?: *+(?<= |^)\\.((?:\\([^)\\n]++\\)|\\[[^\\]\\n]++\\]|\\{[^}\\n]++\\}|<>|>|=|<|\\^|\\-|\\_){1,5}?))');define('TEXY_IMAGE','\[\* *+([^\n'.TEXY_MARK.']{1,1000})'.TEXY_MODIFIER.'? *+(\*|(?<!<)>|<)\]');define('TEXY_LINK_URL','(?:\[[^\]\n]++\]|(?!\[)[^\s'.TEXY_MARK.']{0,1000}?[^:);,.!?\s'.TEXY_MARK.'])');define('TEXY_LINK','(?::('.TEXY_LINK_URL.'))');define('TEXY_LINK_N','(?::('.TEXY_LINK_URL.'|:))');define('TEXY_EMAIL','['.TEXY_CHAR.'][0-9.+_'.TEXY_CHAR.'-]{0,63}@[0-9.+_'.TEXY_CHAR.'\x{ad}-]{1,252}\.['.TEXY_CHAR.'\x{ad}]{2,19}');define('TEXY_URLSCHEME','[a-z][a-z0-9+.-]{0,20}:');abstract
 class
 TexyObject{private
 static$extMethods;final
@@ -28,7 +28,7 @@ ReflectionObject($this);}public
 function
 __call($name,$args){$class=get_class($this);if($name===''){throw
 new
-MemberAccessException("Call to class '$class' method without name.");}if(preg_match('#^on[A-Z]#',$name)){$rp=new
+LogicException("Call to class '$class' method without name.");}if(preg_match('#^on[A-Z]#',$name)){$rp=new
 ReflectionProperty($class,$name);if($rp->isPublic()&&!$rp->isStatic()){$list=$this->$name;if(is_array($list)||$list
 instanceof
 Traversable){foreach($list
@@ -36,12 +36,12 @@ as$handler){if(is_object($handler)){call_user_func_array(array($handler,'__invok
 NULL;}}if($cb=self::extensionMethod("$class::$name")){array_unshift($args,$this);return
 call_user_func_array($cb,$args);}throw
 new
-MemberAccessException("Call to undefined method $class::$name().");}public
+LogicException("Call to undefined method $class::$name().");}public
 static
 function
 __callStatic($name,$args){$class=get_called_class();throw
 new
-MemberAccessException("Call to undefined static method $class::$name().");}public
+LogicException("Call to undefined static method $class::$name().");}public
 static
 function
 extensionMethod($name,$callback=NULL){if(self::$extMethods===NULL||$name===NULL){$list=get_defined_functions();foreach($list['user']as$fce){$pair=explode('_prototype_',$fce);if(count($pair)===2){self::$extMethods[$pair[1]][$pair[0]]=$fce;self::$extMethods[$pair[1]]['']=NULL;}}if($name===NULL)return
@@ -50,23 +50,23 @@ NULL;}if(empty($l)){return
 FALSE;}elseif(isset($l[''][$class])){return$l[''][$class];}$cl=$class;do{$cl=strtolower($cl);if(isset($l[$cl])){return$l[''][$class]=$l[$cl];}}while(($cl=get_parent_class($cl))!==FALSE);foreach(class_implements($class)as$cl){$cl=strtolower($cl);if(isset($l[$cl])){return$l[''][$class]=$l[$cl];}}return$l[''][$class]=FALSE;}public
 function&__get($name){$class=get_class($this);if($name===''){throw
 new
-MemberAccessException("Cannot read a class '$class' property without name.");}$name[0]=$name[0]&"\xDF";$m='get'.$name;if(self::hasAccessor($class,$m)){$val=$this->$m();return$val;}$m='is'.$name;if(self::hasAccessor($class,$m)){$val=$this->$m();return$val;}$name=func_get_arg(0);throw
+LogicException("Cannot read a class '$class' property without name.");}$name[0]=$name[0]&"\xDF";$m='get'.$name;if(self::hasAccessor($class,$m)){$val=$this->$m();return$val;}$m='is'.$name;if(self::hasAccessor($class,$m)){$val=$this->$m();return$val;}$name=func_get_arg(0);throw
 new
-MemberAccessException("Cannot read an undeclared property $class::\$$name.");}public
+LogicException("Cannot read an undeclared property $class::\$$name.");}public
 function
 __set($name,$value){$class=get_class($this);if($name===''){throw
 new
-MemberAccessException("Cannot assign to a class '$class' property without name.");}$name[0]=$name[0]&"\xDF";if(self::hasAccessor($class,'get'.$name)||self::hasAccessor($class,'is'.$name)){$m='set'.$name;if(self::hasAccessor($class,$m)){$this->$m($value);return;}else{$name=func_get_arg(0);throw
+LogicException("Cannot assign to a class '$class' property without name.");}$name[0]=$name[0]&"\xDF";if(self::hasAccessor($class,'get'.$name)||self::hasAccessor($class,'is'.$name)){$m='set'.$name;if(self::hasAccessor($class,$m)){$this->$m($value);return;}else{$name=func_get_arg(0);throw
 new
-MemberAccessException("Cannot assign to a read-only property $class::\$$name.");}}$name=func_get_arg(0);throw
+LogicException("Cannot assign to a read-only property $class::\$$name.");}}$name=func_get_arg(0);throw
 new
-MemberAccessException("Cannot assign to an undeclared property $class::\$$name.");}public
+LogicException("Cannot assign to an undeclared property $class::\$$name.");}public
 function
 __isset($name){$name[0]=$name[0]&"\xDF";return$name!==''&&self::hasAccessor(get_class($this),'get'.$name);}public
 function
 __unset($name){$class=get_class($this);throw
 new
-MemberAccessException("Cannot unset the property $class::\$$name.");}private
+LogicException("Cannot unset the property $class::\$$name.");}private
 static
 function
 hasAccessor($c,$m){static$cache;if(!isset($cache[$c])){$cache[$c]=array_flip(get_class_methods($c));}return
@@ -227,7 +227,8 @@ __construct(Texy$texy,TexyHtml$element,$indented){$this->texy=$texy;$this->eleme
 function
 isIndented(){return$this->indented;}public
 function
-next($pattern,&$matches){$matches=NULL;$ok=preg_match($pattern.'Am',$this->text,$matches,PREG_OFFSET_CAPTURE,$this->offset);if($ok){$this->offset+=strlen($matches[0][0])+1;foreach($matches
+next($pattern,&$matches){if($this->offset>strlen($this->text)){return
+FALSE;}$matches=NULL;$ok=preg_match($pattern.'Am',$this->text,$matches,PREG_OFFSET_CAPTURE,$this->offset);if($ok){$this->offset+=strlen($matches[0][0])+1;foreach($matches
 as$key=>$value)$matches[$key]=$value[0];}return$ok;}public
 function
 moveBackward($linesCount=1){while(--$this->offset>0)if($this->text{$this->offset-1}==="\n"){$linesCount--;if($linesCount<1)break;}$this->offset=max($this->offset,0);}public
@@ -250,7 +251,7 @@ __construct(Texy$texy,TexyHtml$element){$this->texy=$texy;$this->element=$elemen
 function
 parse($text){$tx=$this->texy;$pl=$this->patterns;if(!$pl){$this->element->insert(NULL,$text);return;}$offset=0;$names=array_keys($pl);$arrMatches=$arrOffset=array();foreach($names
 as$name)$arrOffset[$name]=-1;do{$min=NULL;$minOffset=strlen($text);foreach($names
-as$index=>$name){if($arrOffset[$name]<$offset){$delta=($arrOffset[$name]===-2)?1:0;if(preg_match($pl[$name]['pattern'],$text,$arrMatches[$name],PREG_OFFSET_CAPTURE,$offset+$delta)){$m=&$arrMatches[$name];if(!strlen($m[0][0]))continue;$arrOffset[$name]=$m[0][1];foreach($m
+as$index=>$name){if($arrOffset[$name]<$offset){$delta=($arrOffset[$name]===-2)?1:0;if($offset+$delta>strlen($text)){unset($names[$index]);continue;}elseif(preg_match($pl[$name]['pattern'],$text,$arrMatches[$name],PREG_OFFSET_CAPTURE,$offset+$delta)){$m=&$arrMatches[$name];if(!strlen($m[0][0]))continue;$arrOffset[$name]=$m[0][1];foreach($m
 as$keyx=>$value)$m[$keyx]=$value[0];}else{if(!$pl[$name]['again']||!preg_match($pl[$name]['again'],$text,$foo,NULL,$offset+$delta)){unset($names[$index]);}continue;}}if($arrOffset[$name]<$minOffset){$minOffset=$arrOffset[$name];$min=$name;}}if($min===NULL)break;$px=$pl[$min];$offset=$start=$arrOffset[$min];$this->again=FALSE;$res=call_user_func_array($px['handler'],array($this,$arrMatches[$min],$min));if($res
 instanceof
 TexyHtml){$res=$res->toString($tx);}elseif($res===FALSE){$arrOffset[$min]=-2;continue;}$len=strlen($arrMatches[$min][0]);$text=substr_replace($text,(string)$res,$start,$len);$delta=strlen($res)-$len;foreach($names
@@ -311,7 +312,7 @@ __construct($handlers,TexyParser$parser,$args){$this->handlers=$handlers;$this->
 function
 proceed(){if($this->pos===0){throw
 new
-InvalidStateException('No more handlers.');}if(func_num_args()){$this->args=func_get_args();array_unshift($this->args,$this);}$this->pos--;$res=call_user_func_array($this->handlers[$this->pos],$this->args);if($res===NULL){throw
+RuntimeException('No more handlers.');}if(func_num_args()){$this->args=func_get_args();array_unshift($this->args,$this);}$this->pos--;$res=call_user_func_array($this->handlers[$this->pos],$this->args);if($res===NULL){throw
 new
 UnexpectedValueException("Invalid value returned from handler '".print_r($this->handlers[$this->pos],TRUE)."'.");}return$res;}public
 function
@@ -328,7 +329,7 @@ function
 __construct($texy){$this->texy=$texy;$texy->addHandler('paragraph',array($this,'solve'));}public
 function
 process($parser,$content,$el){$tx=$this->texy;if($parser->isIndented()){$parts=preg_split('#(\n(?! )|\n{2,})#',$content,-1,PREG_SPLIT_NO_EMPTY);}else{$parts=preg_split('#(\n{2,})#',$content,-1,PREG_SPLIT_NO_EMPTY);}foreach($parts
-as$s){$s=trim($s);if($s==='')continue;$mx=$mod=NULL;if(preg_match('#\A(.*)(?<=\A|\S)'.TEXY_MODIFIER_H.'(\n.*)?()\z#sUm',$s,$mx)){list(,$mC1,$mMod,$mC2)=$mx;$s=trim($mC1.$mC2);if($s==='')continue;$mod=new
+as$s){$s=trim($s);if($s==='')continue;$mx=$mod=NULL;if(preg_match('#'.TEXY_MODIFIER_H.'(?=\n|\z)#sUm',$s,$mx,PREG_OFFSET_CAPTURE)){list($mMod)=$mx[1];$s=trim(substr_replace($s,'',$mx[0][1],strlen($mx[0][0])));if($s==='')continue;$mod=new
 TexyModifier;$mod->setProperties($mMod);}$res=$tx->invokeAroundHandlers('paragraph',$parser,array($s,$mod));if($res)$el->insert(NULL,$res);}}public
 function
 solve($invocation,$content,$mod){$tx=$this->texy;if($tx->mergeLines){$content=preg_replace('#\n +(?=\S)#',"\r",$content);}else{$content=preg_replace('#\n#',"\r",$content);}$el=TexyHtml::el('p');$el->parseLine($tx,$content);$content=$el->getText();if(strpos($content,Texy::CONTENT_BLOCK)!==FALSE){$el->setName(NULL);}elseif(strpos($content,Texy::CONTENT_TEXTUAL)!==FALSE){}elseif(preg_match('#[^\s'.TEXY_MARK.']#u',$content)){}elseif(strpos($content,Texy::CONTENT_REPLACED)!==FALSE){$el->setName($tx->nontextParagraph);}else{if(!$mod)$el->setName(NULL);}if($el->getName()){if($mod)$mod->decorate($tx,$el);if(strpos($content,"\r")!==FALSE){$key=$tx->protect('<br />',Texy::CONTENT_REPLACED);$content=str_replace("\r",$key,$content);};}$content=strtr($content,"\r\n",'  ');$el->setText($content);return$el;}}final
@@ -357,13 +358,13 @@ extends
 TexyModule{const
 DYNAMIC=1,FIXED=2;public$title;public$TOC;public$generateID=FALSE;public$idPrefix='toc-';public$top=1;public$moreMeansHigher=TRUE;public$balancing=TexyHeadingModule::DYNAMIC;public$levels=array('#'=>0,'*'=>1,'='=>2,'-'=>3);private$usedID;public
 function
-__construct($texy){$this->texy=$texy;$texy->addHandler('heading',array($this,'solve'));$texy->addHandler('beforeParse',array($this,'beforeParse'));$texy->addHandler('afterParse',array($this,'afterParse'));$texy->registerBlockPattern(array($this,'patternUnderline'),'#^(\S.*)'.TEXY_MODIFIER_H.'?\n'.'(\#{3,}|\*{3,}|={3,}|-{3,})$#mU','heading/underlined');$texy->registerBlockPattern(array($this,'patternSurround'),'#^(\#{2,}+|={2,}+)(.+)'.TEXY_MODIFIER_H.'?()$#mU','heading/surrounded');}public
+__construct($texy){$this->texy=$texy;$texy->addHandler('heading',array($this,'solve'));$texy->addHandler('beforeParse',array($this,'beforeParse'));$texy->addHandler('afterParse',array($this,'afterParse'));$texy->registerBlockPattern(array($this,'patternUnderline'),'#^(\S.{0,1000})'.TEXY_MODIFIER_H.'?\n'.'(\#{3,}+|\*{3,}+|={3,}+|-{3,}+)$#mU','heading/underlined');$texy->registerBlockPattern(array($this,'patternSurround'),'#^(\#{2,}+|={2,}+)(.+)'.TEXY_MODIFIER_H.'?()$#mU','heading/surrounded');}public
 function
 beforeParse(){$this->title=NULL;$this->usedID=array();$this->TOC=array();}public
 function
 afterParse($texy,$DOM,$isSingleLine){if($isSingleLine)return;if($this->balancing===self::DYNAMIC){$top=$this->top;$map=array();$min=100;foreach($this->TOC
 as$item){$level=$item['level'];if($item['type']==='surrounded'){$min=min($level,$min);$top=$this->top-$min;}elseif($item['type']==='underlined'){$map[$level]=$level;}}asort($map);$map=array_flip(array_values($map));}foreach($this->TOC
-as$key=>$item){if($this->balancing===self::DYNAMIC){if($item['type']==='surrounded'){$level=$item['level']+$top;}elseif($item['type']==='underlined'){$level=$map[$item['level']]+$this->top;}else{$level=$item['level'];}$item['el']->setName('h'.min(6,max(1,$level)));$this->TOC[$key]['level']=$level;}if($this->generateID&&empty($item['el']->attrs['id'])){$title=trim($item['el']->toText($this->texy));if($title!==''){$this->TOC[$key]['title']=$title;$id=$this->idPrefix.Texy::webalize($title);$counter='';if(isset($this->usedID[$id.$counter])){$counter=2;while(isset($this->usedID[$id.'-'.$counter]))$counter++;$id.='-'.$counter;}$this->usedID[$id]=TRUE;$item['el']->attrs['id']=$id;}}}if($this->title===NULL&&count($this->TOC)){$item=reset($this->TOC);$this->title=isset($item['title'])?$item['title']:trim($item['el']->toText($this->texy));}}public
+as$key=>$item){if($this->balancing===self::DYNAMIC){if($item['type']==='surrounded'){$level=$item['level']+$top;}elseif($item['type']==='underlined'){$level=$map[$item['level']]+$this->top;}else{$level=$item['level'];}$item['el']->setName('h'.min(6,max(1,$level)));$this->TOC[$key]['level']=$level;}if($this->generateID){if(!empty($item['el']->style['toc'])&&is_array($item['el']->style)){$title=$item['el']->style['toc'];unset($item['el']->style['toc']);}else{$title=trim($item['el']->toText($this->texy));}$this->TOC[$key]['title']=$title;if(empty($item['el']->attrs['id'])){$id=$this->idPrefix.Texy::webalize($title);$counter='';if(isset($this->usedID[$id.$counter])){$counter=2;while(isset($this->usedID[$id.'-'.$counter]))$counter++;$id.='-'.$counter;}$this->usedID[$id]=TRUE;$item['el']->attrs['id']=$id;}}}if($this->title===NULL&&count($this->TOC)){$item=reset($this->TOC);$this->title=isset($item['title'])?$item['title']:trim($item['el']->toText($this->texy));}}public
 function
 patternUnderline($parser,$matches){list(,$mContent,$mMod,$mLine)=$matches;$mod=new
 TexyModifier($mMod);$level=$this->levels[$mLine[0]];return$this->texy->invokeAroundHandlers('heading',$parser,array($level,$mContent,$mod,FALSE));}public
@@ -377,7 +378,7 @@ TexyHorizLineModule
 extends
 TexyModule{public$classes=array('-'=>NULL,'*'=>NULL);public
 function
-__construct($texy){$this->texy=$texy;$texy->addHandler('horizline',array($this,'solve'));$texy->registerBlockPattern(array($this,'pattern'),'#^(\*{3,}|-{3,})\ *'.TEXY_MODIFIER.'?()$#mU','horizline');}public
+__construct($texy){$this->texy=$texy;$texy->addHandler('horizline',array($this,'solve'));$texy->registerBlockPattern(array($this,'pattern'),'#^(\*{3,}+|-{3,}+)\ *'.TEXY_MODIFIER.'?()$#mU','horizline');}public
 function
 pattern($parser,$matches){list(,$mType,$mMod)=$matches;$mod=new
 TexyModifier($mMod);return$this->texy->invokeAroundHandlers('horizline',$parser,array($mType,$mod));}public
@@ -388,7 +389,7 @@ TexyHtmlModule
 extends
 TexyModule{public$passComment=TRUE;public
 function
-__construct($texy){$this->texy=$texy;$texy->addHandler('htmlComment',array($this,'solveComment'));$texy->addHandler('htmlTag',array($this,'solveTag'));$texy->registerLinePattern(array($this,'patternTag'),'#<(/?)([a-z][a-z0-9_:-]*)((?:\s+[a-z0-9:-]+|=\s*"[^"'.TEXY_MARK.']*"|=\s*\'[^\''.TEXY_MARK.']*\'|=[^\s>'.TEXY_MARK.']+)*)\s*(/?)>#isu','html/tag');$texy->registerLinePattern(array($this,'patternComment'),'#<!--([^'.TEXY_MARK.']*?)-->#is','html/comment');}public
+__construct($texy){$this->texy=$texy;$texy->addHandler('htmlComment',array($this,'solveComment'));$texy->addHandler('htmlTag',array($this,'solveTag'));$texy->registerLinePattern(array($this,'patternTag'),'#<(/?)([a-z][a-z0-9_:-]{0,50})((?:\s++[a-z0-9:-]++|=\s*+"[^"'.TEXY_MARK.']*+"|=\s*+\'[^\''.TEXY_MARK.']*+\'|=[^\s>'.TEXY_MARK.']++)*)\s*+(/?)>#isu','html/tag');$texy->registerLinePattern(array($this,'patternComment'),'#<!--([^'.TEXY_MARK.']*?)-->#is','html/comment');}public
 function
 patternComment($parser,$matches){list(,$mComment)=$matches;return$this->texy->invokeAroundHandlers('htmlComment',$parser,array($mComment));}public
 function
@@ -415,7 +416,7 @@ TexyFigureModule
 extends
 TexyModule{public$class='figure';public$leftClass;public$rightClass;public$widthDelta=10;public
 function
-__construct($texy){$this->texy=$texy;$texy->addHandler('figure',array($this,'solve'));$texy->registerBlockPattern(array($this,'pattern'),'#^'.TEXY_IMAGE.TEXY_LINK_N.'?? +\*\*\* +(.*)'.TEXY_MODIFIER_H.'?()$#mUu','figure');}public
+__construct($texy){$this->texy=$texy;$texy->addHandler('figure',array($this,'solve'));$texy->registerBlockPattern(array($this,'pattern'),'#^'.TEXY_IMAGE.TEXY_LINK_N.'?? ++\*\*\* ++(.{0,2000})'.TEXY_MODIFIER_H.'?()$#mUu','figure');}public
 function
 pattern($parser,$matches){list(,$mURLs,$mImgMod,$mAlign,$mLink,$mContent,$mMod)=$matches;$tx=$this->texy;$image=$tx->imageModule->factoryImage($mURLs,$mImgMod.$mAlign);$mod=new
 TexyModifier($mMod);$mContent=ltrim($mContent);if($mLink){if($mLink===':'){$link=new
@@ -430,7 +431,7 @@ TexyModule{public$root='images/';public$linkedRoot='images/';public$fileRoot=NUL
 function
 __construct($texy){$this->texy=$texy;$texy->allowed['image/definition']=TRUE;$texy->addHandler('image',array($this,'solve'));$texy->addHandler('beforeParse',array($this,'beforeParse'));$texy->registerLinePattern(array($this,'patternImage'),'#'.TEXY_IMAGE.TEXY_LINK_N.'??()#Uu','image');}public
 function
-beforeParse($texy,&$text){if(!empty($texy->allowed['image/definition'])){$text=preg_replace_callback('#^\[\*([^\n]+)\*\]:\ +(.+)\ *'.TEXY_MODIFIER.'?\s*()$#mUu',array($this,'patternReferenceDef'),$text);}}private
+beforeParse($texy,&$text){if(!empty($texy->allowed['image/definition'])){$text=preg_replace_callback('#^\[\*([^\n]{1,100})\*\]:\ +(.{1,1000})\ *'.TEXY_MODIFIER.'?\s*()$#mUu',array($this,'patternReferenceDef'),$text);}}private
 function
 patternReferenceDef($matches){list(,$mRef,$mURLs,$mMod)=$matches;$image=$this->factoryImage($mURLs,$mMod,FALSE);$this->addReference($mRef,$image);return'';}public
 function
@@ -463,9 +464,9 @@ extends
 TexyModule{public$root='';public$imageOnClick='return !popupImage(this.href)';public$popupOnClick='return !popup(this.href)';public$forceNoFollow=FALSE;public$shorten=TRUE;private$references=array();private
 static$livelock;public
 function
-__construct($texy){$this->texy=$texy;$texy->allowed['link/definition']=TRUE;$texy->addHandler('newReference',array($this,'solveNewReference'));$texy->addHandler('linkReference',array($this,'solve'));$texy->addHandler('linkEmail',array($this,'solveUrlEmail'));$texy->addHandler('linkURL',array($this,'solveUrlEmail'));$texy->addHandler('beforeParse',array($this,'beforeParse'));$texy->registerLinePattern(array($this,'patternReference'),'#(\[[^\[\]\*\n'.TEXY_MARK.']+\])#U','link/reference');$texy->registerLinePattern(array($this,'patternUrlEmail'),'#(?<=^|[\s([<:\x17])(?:https?://|www\.|ftp://)[0-9.'.TEXY_CHAR.'-][/\d'.TEXY_CHAR.'+\.~%&?@=_:;\#,\x{ad}-]+[/\d'.TEXY_CHAR.'+~%?@=_\#]#u','link/url','#(?:https?://|www\.|ftp://)#u');$texy->registerLinePattern(array($this,'patternUrlEmail'),'#(?<=^|[\s([<:\x17])'.TEXY_EMAIL.'#u','link/email','#'.TEXY_EMAIL.'#u');}public
+__construct($texy){$this->texy=$texy;$texy->allowed['link/definition']=TRUE;$texy->addHandler('newReference',array($this,'solveNewReference'));$texy->addHandler('linkReference',array($this,'solve'));$texy->addHandler('linkEmail',array($this,'solveUrlEmail'));$texy->addHandler('linkURL',array($this,'solveUrlEmail'));$texy->addHandler('beforeParse',array($this,'beforeParse'));$texy->registerLinePattern(array($this,'patternReference'),'#(\[[^\[\]\*\n'.TEXY_MARK.']++\])#U','link/reference');$texy->registerLinePattern(array($this,'patternUrlEmail'),'#(?<=^|[\s([<:\x17])(?:https?://|www\.|ftp://)[0-9.'.TEXY_CHAR.'-][/\d'.TEXY_CHAR.'+\.~%&?@=_:;\#,\x{ad}-]{1,1000}[/\d'.TEXY_CHAR.'+~%?@=_\#]#u','link/url','#(?:https?://|www\.|ftp://)#u');$texy->registerLinePattern(array($this,'patternUrlEmail'),'#(?<=^|[\s([<\x17])'.TEXY_EMAIL.'#u','link/email','#'.TEXY_EMAIL.'#u');}public
 function
-beforeParse($texy,&$text){self::$livelock=array();if(!empty($texy->allowed['link/definition'])){$text=preg_replace_callback('#^\[([^\[\]\#\?\*\n]+)\]: +(\S+)(\ .+)?'.TEXY_MODIFIER.'?\s*()$#mUu',array($this,'patternReferenceDef'),$text);}}private
+beforeParse($texy,&$text){self::$livelock=array();if(!empty($texy->allowed['link/definition'])){$text=preg_replace_callback('#^\[([^\[\]\#\?\*\n]{1,100})\]: ++(\S{1,1000})(\ .{1,1000})?'.TEXY_MODIFIER.'?\s*()$#mUu',array($this,'patternReferenceDef'),$text);}}private
 function
 patternReferenceDef($matches){list(,$mRef,$mLink,$mLabel,$mMod)=$matches;$link=new
 TexyLink($mLink);$link->label=trim($mLabel);$link->modifier->setProperties($mMod);$this->checkLink($link);$this->addReference($mRef,$link);return'';}public
@@ -515,7 +516,7 @@ function
 __construct($texy){$this->texy=$texy;$texy->addHandler('beforeParse',array($this,'beforeParse'));$texy->allowed['list']=TRUE;$texy->allowed['list/definition']=TRUE;}public
 function
 beforeParse(){$RE=$REul=array();foreach($this->bullets
-as$desc){$RE[]=$desc[0];if(!$desc[1])$REul[]=$desc[0];}$this->texy->registerBlockPattern(array($this,'patternList'),'#^(?:'.TEXY_MODIFIER_H.'\n)?'.'('.implode('|',$RE).')\ *\S.*$#mUu','list');$this->texy->registerBlockPattern(array($this,'patternDefList'),'#^(?:'.TEXY_MODIFIER_H.'\n)?'.'(\S.*)\:\ *'.TEXY_MODIFIER_H.'?\n'.'(\ ++)('.implode('|',$REul).')\ *\S.*$#mUu','list/definition');}public
+as$desc){$RE[]=$desc[0];if(!$desc[1])$REul[]=$desc[0];}$this->texy->registerBlockPattern(array($this,'patternList'),'#^(?:'.TEXY_MODIFIER_H.'\n)?'.'('.implode('|',$RE).')\ *+\S.*$#mUu','list');$this->texy->registerBlockPattern(array($this,'patternDefList'),'#^(?:'.TEXY_MODIFIER_H.'\n)?'.'(\S.{0,2000})\:\ *'.TEXY_MODIFIER_H.'?\n'.'(\ ++)('.implode('|',$REul).')\ *+\S.*$#mUu','list/definition');}public
 function
 patternList($parser,$matches){list(,$mMod,$mBullet)=$matches;$tx=$this->texy;$el=TexyHtml::el();$bullet=$min=NULL;foreach($this->bullets
 as$type=>$desc)if(preg_match('#'.$desc[0].'#Au',$mBullet)){$bullet=isset($desc[3])?$desc[3]:$desc[0];$min=isset($desc[3])?2:1;$el->setName($desc[1]?'ol':'ul');$el->attrs['style']['list-style-type']=$desc[2];if($desc[1]){if($type[0]==='1'&&(int)$mBullet>1)$el->attrs['start']=(int)$mBullet;elseif($type[0]==='a'&&$mBullet[0]>'a')$el->attrs['start']=ord($mBullet[0])-96;elseif($type[0]==='A'&&$mBullet[0]>'A')$el->attrs['start']=ord($mBullet[0])-64;}break;}$mod=new
@@ -535,14 +536,15 @@ class
 TexyLongWordsModule
 extends
 TexyModule{public$wordLimit=20;const
-DONT=0,HERE=1,AFTER=2;private$consonants=array('b','c','d','f','g','h','j','k','l','m','n','p','q','r','s','t','v','w','x','z','B','C','D','F','G','H','J','K','L','M','N','P','Q','R','S','T','V','W','X','Z',"\xc4\x8d","\xc4\x8f","\xc5\x88","\xc5\x99","\xc5\xa1","\xc5\xa5","\xc5\xbe","\xc4\x8c","\xc4\x8e","\xc5\x87","\xc5\x98","\xc5\xa0","\xc5\xa4","\xc5\xbd");private$vowels=array('a','e','i','o','u','y','A','E','I','O','U','Y',"\xc3\xa1","\xc3\xa9","\xc4\x9b","\xc3\xad","\xc3\xb3","\xc3\xba","\xc5\xaf","\xc3\xbd","\xc3\x81","\xc3\x89","\xc4\x9a","\xc3\x8d","\xc3\x93","\xc3\x9a","\xc5\xae","\xc3\x9d");private$before_r=array('b','B','c','C','d','D','f','F','g','G','k','K','p','P','r','R','t','T','v','V',"\xc4\x8d","\xc4\x8c","\xc4\x8f","\xc4\x8e","\xc5\x99","\xc5\x98","\xc5\xa5","\xc5\xa4");private$before_l=array('b','B','c','C','d','D','f','F','g','G','k','K','l','L','p','P','t','T','v','V',"\xc4\x8d","\xc4\x8c","\xc4\x8f","\xc4\x8e","\xc5\xa5","\xc5\xa4");private$before_h=array('c','C','s','S');private$doubleVowels=array('a','A','o','O');public
+DONT=0,HERE=1,AFTER=2;const
+SAFE_LIMIT=1000;private$consonants=array('b','c','d','f','g','h','j','k','l','m','n','p','q','r','s','t','v','w','x','z','B','C','D','F','G','H','J','K','L','M','N','P','Q','R','S','T','V','W','X','Z',"\xc4\x8d","\xc4\x8f","\xc5\x88","\xc5\x99","\xc5\xa1","\xc5\xa5","\xc5\xbe","\xc4\x8c","\xc4\x8e","\xc5\x87","\xc5\x98","\xc5\xa0","\xc5\xa4","\xc5\xbd");private$vowels=array('a','e','i','o','u','y','A','E','I','O','U','Y',"\xc3\xa1","\xc3\xa9","\xc4\x9b","\xc3\xad","\xc3\xb3","\xc3\xba","\xc5\xaf","\xc3\xbd","\xc3\x81","\xc3\x89","\xc4\x9a","\xc3\x8d","\xc3\x93","\xc3\x9a","\xc5\xae","\xc3\x9d");private$before_r=array('b','B','c','C','d','D','f','F','g','G','k','K','p','P','r','R','t','T','v','V',"\xc4\x8d","\xc4\x8c","\xc4\x8f","\xc4\x8e","\xc5\x99","\xc5\x98","\xc5\xa5","\xc5\xa4");private$before_l=array('b','B','c','C','d','D','f','F','g','G','k','K','l','L','p','P','t','T','v','V',"\xc4\x8d","\xc4\x8c","\xc4\x8f","\xc4\x8e","\xc5\xa5","\xc5\xa4");private$before_h=array('c','C','s','S');private$doubleVowels=array('a','A','o','O');public
 function
 __construct($texy){$this->texy=$texy;$this->consonants=array_flip($this->consonants);$this->vowels=array_flip($this->vowels);$this->before_r=array_flip($this->before_r);$this->before_l=array_flip($this->before_l);$this->before_h=array_flip($this->before_h);$this->doubleVowels=array_flip($this->doubleVowels);$texy->registerPostLine(array($this,'postLine'),'longwords');}public
 function
 postLine($text){return
 preg_replace_callback('#[^\ \n\t\x14\x15\x16\x{2013}\x{2014}\x{ad}-]{'.$this->wordLimit.',}#u',array($this,'pattern'),$text);}private
 function
-pattern($matches){list($mWord)=$matches;$chars=array();preg_match_all('#['.TEXY_MARK.']+|.#u',$mWord,$chars);$chars=$chars[0];if(count($chars)<$this->wordLimit)return$mWord;$consonants=$this->consonants;$vowels=$this->vowels;$before_r=$this->before_r;$before_l=$this->before_l;$before_h=$this->before_h;$doubleVowels=$this->doubleVowels;$s=array();$trans=array();$s[]='';$trans[]=-1;foreach($chars
+pattern($matches){list($mWord)=$matches;if(iconv_strlen($mWord)>self::SAFE_LIMIT)return$mWord;$chars=array();preg_match_all('#['.TEXY_MARK.']+|.#u',$mWord,$chars);$chars=$chars[0];if(count($chars)<$this->wordLimit)return$mWord;$consonants=$this->consonants;$vowels=$this->vowels;$before_r=$this->before_r;$before_l=$this->before_l;$before_h=$this->before_h;$doubleVowels=$this->doubleVowels;$s=array();$trans=array();$s[]='';$trans[]=-1;foreach($chars
 as$key=>$char){if(ord($char{0})<32)continue;$s[]=$char;$trans[]=$key;}$s[]='';$len=count($s)-2;$positions=array();$a=0;$last=1;while(++$a<$len){$hyphen=self::DONT;do{if($s[$a]==="\xC2\xA0"){$a++;continue
 2;}if($s[$a]==='.'){$hyphen=self::HERE;break;}if(isset($consonants[$s[$a]])){if(isset($vowels[$s[$a+1]])){if(isset($vowels[$s[$a-1]]))$hyphen=self::HERE;break;}if(($s[$a]==='s')&&($s[$a-1]==='n')&&isset($consonants[$s[$a+1]])){$hyphen=self::AFTER;break;}if(isset($consonants[$s[$a+1]])&&isset($vowels[$s[$a-1]])){if($s[$a+1]==='r'){$hyphen=isset($before_r[$s[$a]])?self::HERE:self::AFTER;break;}if($s[$a+1]==='l'){$hyphen=isset($before_l[$s[$a]])?self::HERE:self::AFTER;break;}if($s[$a+1]==='h'){$hyphen=isset($before_h[$s[$a]])?self::DONT:self::AFTER;break;}$hyphen=self::AFTER;break;}break;}if(($s[$a]==='u')&&isset($doubleVowels[$s[$a-1]])){$hyphen=self::AFTER;break;}if(isset($vowels[$s[$a]])&&isset($vowels[$s[$a-1]])){$hyphen=self::HERE;break;}}while(0);if($hyphen===self::DONT&&($a-$last>$this->wordLimit*0.6))$positions[]=$last=$a-1;if($hyphen===self::HERE)$positions[]=$last=$a-1;if($hyphen===self::AFTER){$positions[]=$last=$a;$a++;}}$a=end($positions);if(($a===$len-1)&&isset($consonants[$s[$len]]))array_pop($positions);$syllables=array();$last=0;foreach($positions
 as$pos){if($pos-$last>$this->wordLimit*0.6){$syllables[]=implode('',array_splice($chars,0,$trans[$pos]-$trans[$last]));$last=$pos;}}$syllables[]=implode('',$chars);return
@@ -552,7 +554,7 @@ TexyPhraseModule
 extends
 TexyModule{public$tags=array('phrase/strong'=>'strong','phrase/em'=>'em','phrase/em-alt'=>'em','phrase/em-alt2'=>'em','phrase/ins'=>'ins','phrase/del'=>'del','phrase/sup'=>'sup','phrase/sup-alt'=>'sup','phrase/sub'=>'sub','phrase/sub-alt'=>'sub','phrase/span'=>'a','phrase/span-alt'=>'a','phrase/cite'=>'cite','phrase/acronym'=>'acronym','phrase/acronym-alt'=>'acronym','phrase/code'=>'code','phrase/quote'=>'q','phrase/quicklink'=>'a');public$linksAllowed=TRUE;public
 function
-__construct($texy){$this->texy=$texy;$texy->addHandler('phrase',array($this,'solve'));$texy->registerLinePattern(array($this,'patternPhrase'),'#(?<!\*)\*\*\*(?![\s*])(.+)'.TEXY_MODIFIER.'?(?<![\s*])\*\*\*(?!\*)'.TEXY_LINK.'??()#Uus','phrase/strong+em');$texy->registerLinePattern(array($this,'patternPhrase'),'#(?<!\*)\*\*(?![\s*])(.+)'.TEXY_MODIFIER.'?(?<![\s*])\*\*(?!\*)'.TEXY_LINK.'??()#Uus','phrase/strong');$texy->registerLinePattern(array($this,'patternPhrase'),'#(?<![/:])\/\/(?![\s/])(.+)'.TEXY_MODIFIER.'?(?<![\s/:])\/\/(?!\/)'.TEXY_LINK.'??()#Uus','phrase/em');$texy->registerLinePattern(array($this,'patternPhrase'),'#(?<!\*)\*(?![\s*])(\S+)'.TEXY_MODIFIER.'?(?<![\s*])\*(?!\*)'.TEXY_LINK.'??()#Uus','phrase/em-alt');$texy->registerLinePattern(array($this,'patternPhrase'),'#(?<![^\s.,;:<>()"\''.TEXY_MARK.'-])\*(?![\s*])(.+)'.TEXY_MODIFIER.'?(?<![\s*])\*(?![^\s.,;:<>()"?!\'-])'.TEXY_LINK.'??()#Uus','phrase/em-alt2');$texy->registerLinePattern(array($this,'patternPhrase'),'#(?<!\+)\+\+(?![\s+])([^\r\n]+)'.TEXY_MODIFIER.'?(?<![\s+])\+\+(?!\+)()#Uu','phrase/ins');$texy->registerLinePattern(array($this,'patternPhrase'),'#(?<![<-])\-\-(?![\s>-])([^\r\n]+)'.TEXY_MODIFIER.'?(?<![\s<-])\-\-(?![>-])()#Uu','phrase/del');$texy->registerLinePattern(array($this,'patternPhrase'),'#(?<!\^)\^\^(?![\s^])([^\r\n]+)'.TEXY_MODIFIER.'?(?<![\s^])\^\^(?!\^)()#Uu','phrase/sup');$texy->registerLinePattern(array($this,'patternSupSub'),'#(?<=[a-z0-9])\^([n0-9+-]{1,4}?)(?![a-z0-9])#Uui','phrase/sup-alt');$texy->registerLinePattern(array($this,'patternPhrase'),'#(?<!\_)\_\_(?![\s_])([^\r\n]+)'.TEXY_MODIFIER.'?(?<![\s_])\_\_(?!\_)()#Uu','phrase/sub');$texy->registerLinePattern(array($this,'patternSupSub'),'#(?<=[a-z])\_([n0-9]{1,3})(?![a-z0-9])#Uui','phrase/sub-alt');$texy->registerLinePattern(array($this,'patternPhrase'),'#(?<!\")\"(?!\s)([^\"\r]+)'.TEXY_MODIFIER.'?(?<!\s)\"(?!\")'.TEXY_LINK.'??()#Uu','phrase/span');$texy->registerLinePattern(array($this,'patternPhrase'),'#(?<!\~)\~(?!\s)([^\~\r]+)'.TEXY_MODIFIER.'?(?<!\s)\~(?!\~)'.TEXY_LINK.'??()#Uu','phrase/span-alt');$texy->registerLinePattern(array($this,'patternPhrase'),'#(?<!\~)\~\~(?![\s~])([^\r\n]+)'.TEXY_MODIFIER.'?(?<![\s~])\~\~(?!\~)'.TEXY_LINK.'??()#Uu','phrase/cite');$texy->registerLinePattern(array($this,'patternPhrase'),'#(?<!\>)\>\>(?![\s>])([^\r\n]+)'.TEXY_MODIFIER.'?(?<![\s<])\<\<(?!\<)'.TEXY_LINK.'??()#Uu','phrase/quote');$texy->registerLinePattern(array($this,'patternPhrase'),'#(?<!\")\"(?!\s)([^\"\r\n]+)'.TEXY_MODIFIER.'?(?<!\s)\"(?!\")\(\((.+)\)\)()#Uu','phrase/acronym');$texy->registerLinePattern(array($this,'patternPhrase'),'#(?<!['.TEXY_CHAR.'])(['.TEXY_CHAR.']{2,})()\(\((.+)\)\)#Uu','phrase/acronym-alt');$texy->registerLinePattern(array($this,'patternNoTexy'),'#(?<!\')\'\'(?![\s\'])([^'.TEXY_MARK.'\r\n]*)(?<![\s\'])\'\'(?!\')()#Uu','phrase/notexy');$texy->registerLinePattern(array($this,'patternPhrase'),'#\`(\S[^'.TEXY_MARK.'\r\n]*)'.TEXY_MODIFIER.'?(?<!\s)\`'.TEXY_LINK.'??()#Uu','phrase/code');$texy->registerLinePattern(array($this,'patternPhrase'),'#(['.TEXY_CHAR.'0-9@\#$%&.,_-]+)()(?=:\[)'.TEXY_LINK.'()#Uu','phrase/quicklink');$texy->allowed['phrase/ins']=FALSE;$texy->allowed['phrase/del']=FALSE;$texy->allowed['phrase/sup']=FALSE;$texy->allowed['phrase/sub']=FALSE;$texy->allowed['phrase/cite']=FALSE;}public
+__construct($texy){$this->texy=$texy;$texy->addHandler('phrase',array($this,'solve'));$texy->registerLinePattern(array($this,'patternPhrase'),'#(?<!\*)\*\*\*(?![\s*])((?:[^ *]++|[ *])+)'.TEXY_MODIFIER.'?(?<![\s*])\*\*\*(?!\*)'.TEXY_LINK.'??()#Uus','phrase/strong+em');$texy->registerLinePattern(array($this,'patternPhrase'),'#(?<!\*)\*\*(?![\s*])((?:[^ *]++|[ *])+)'.TEXY_MODIFIER.'?(?<![\s*])\*\*(?!\*)'.TEXY_LINK.'??()#Uus','phrase/strong');$texy->registerLinePattern(array($this,'patternPhrase'),'#(?<![/:])\/\/(?![\s/])((?:[^ /]++|[ /])+)'.TEXY_MODIFIER.'?(?<![\s/:])\/\/(?!\/)'.TEXY_LINK.'??()#Uus','phrase/em');$texy->registerLinePattern(array($this,'patternPhrase'),'#(?<!\*)\*(?![\s*])((?:[^\s*]++|[*])+)'.TEXY_MODIFIER.'?(?<![\s*])\*(?!\*)'.TEXY_LINK.'??()#Uus','phrase/em-alt');$texy->registerLinePattern(array($this,'patternPhrase'),'#(?<![^\s.,;:<>()"\''.TEXY_MARK.'-])\*(?![\s*])((?:[^ *]++|[ *])+)'.TEXY_MODIFIER.'?(?<![\s*])\*(?![^\s.,;:<>()"?!\'-])'.TEXY_LINK.'??()#Uus','phrase/em-alt2');$texy->registerLinePattern(array($this,'patternPhrase'),'#(?<!\+)\+\+(?![\s+])((?:[^\r\n +]++|[ +])+)'.TEXY_MODIFIER.'?(?<![\s+])\+\+(?!\+)()#Uu','phrase/ins');$texy->registerLinePattern(array($this,'patternPhrase'),'#(?<![<-])\-\-(?![\s>-])((?:[^\r\n -]++|[ -])+)'.TEXY_MODIFIER.'?(?<![\s<-])\-\-(?![>-])()#Uu','phrase/del');$texy->registerLinePattern(array($this,'patternPhrase'),'#(?<!\^)\^\^(?![\s^])((?:[^\r\n ^]++|[ ^])+)'.TEXY_MODIFIER.'?(?<![\s^])\^\^(?!\^)()#Uu','phrase/sup');$texy->registerLinePattern(array($this,'patternSupSub'),'#(?<=[a-z0-9])\^([n0-9+-]{1,4}?)(?![a-z0-9])#Uui','phrase/sup-alt');$texy->registerLinePattern(array($this,'patternPhrase'),'#(?<!\_)\_\_(?![\s_])((?:[^\r\n _]++|[ _])+)'.TEXY_MODIFIER.'?(?<![\s_])\_\_(?!\_)()#Uu','phrase/sub');$texy->registerLinePattern(array($this,'patternSupSub'),'#(?<=[a-z])\_([n0-9]{1,3})(?![a-z0-9])#Uui','phrase/sub-alt');$texy->registerLinePattern(array($this,'patternPhrase'),'#(?<!\")\"(?!\s)((?:[^\r "]++|[ ])+)'.TEXY_MODIFIER.'?(?<!\s)\"(?!\")'.TEXY_LINK.'??()#Uu','phrase/span');$texy->registerLinePattern(array($this,'patternPhrase'),'#(?<!\~)\~(?!\s)((?:[^\r ~]++|[ ])+)'.TEXY_MODIFIER.'?(?<!\s)\~(?!\~)'.TEXY_LINK.'??()#Uu','phrase/span-alt');$texy->registerLinePattern(array($this,'patternPhrase'),'#(?<!\~)\~\~(?![\s~])((?:[^\r\n ~]++|[ ~])+)'.TEXY_MODIFIER.'?(?<![\s~])\~\~(?!\~)'.TEXY_LINK.'??()#Uu','phrase/cite');$texy->registerLinePattern(array($this,'patternPhrase'),'#(?<!\>)\>\>(?![\s>])((?:[^\r\n <]++|[ <])+)'.TEXY_MODIFIER.'?(?<![\s<])\<\<(?!\<)'.TEXY_LINK.'??()#Uu','phrase/quote');$texy->registerLinePattern(array($this,'patternPhrase'),'#(?<!\")\"(?!\s)((?:[^\r\n "]++|[ ])+)'.TEXY_MODIFIER.'?(?<!\s)\"(?!\")\(\((.+)\)\)()#Uu','phrase/acronym');$texy->registerLinePattern(array($this,'patternPhrase'),'#(?<!['.TEXY_CHAR.'])(['.TEXY_CHAR.']{2,})()\(\(((?:[^\n )]++|[ )])+)\)\)#Uu','phrase/acronym-alt');$texy->registerLinePattern(array($this,'patternNoTexy'),'#(?<!\')\'\'(?![\s\'])((?:[^'.TEXY_MARK.'\r\n\']++|[\'])+)(?<![\s\'])\'\'(?!\')()#Uu','phrase/notexy');$texy->registerLinePattern(array($this,'patternPhrase'),'#\`(\S(?:[^'.TEXY_MARK.'\r\n `]++|[ `])*)'.TEXY_MODIFIER.'?(?<!\s)\`'.TEXY_LINK.'??()#Uu','phrase/code');$texy->registerLinePattern(array($this,'patternPhrase'),'#(['.TEXY_CHAR.'0-9@\#$%&.,_-]++)()(?=:\[)'.TEXY_LINK.'()#Uu','phrase/quicklink');$texy->allowed['phrase/ins']=FALSE;$texy->allowed['phrase/del']=FALSE;$texy->allowed['phrase/sup']=FALSE;$texy->allowed['phrase/sub']=FALSE;$texy->allowed['phrase/cite']=FALSE;}public
 function
 patternPhrase($parser,$matches,$phrase){list(,$mContent,$mMod,$mLink)=$matches;$tx=$this->texy;$mod=new
 TexyModifier($mMod);$link=NULL;$parser->again=$phrase!=='phrase/code'&&$phrase!=='phrase/quicklink';if($phrase==='phrase/span'||$phrase==='phrase/span-alt'){if($mLink==NULL){if(!$mMod)return
@@ -569,7 +571,7 @@ TexyBlockQuoteModule
 extends
 TexyModule{public
 function
-__construct($texy){$this->texy=$texy;$texy->registerBlockPattern(array($this,'pattern'),'#^(?:'.TEXY_MODIFIER_H.'\n)?\>(\ +|:)(\S.*)$#mU','blockquote');}public
+__construct($texy){$this->texy=$texy;$texy->registerBlockPattern(array($this,'pattern'),'#^(?:'.TEXY_MODIFIER_H.'\n)?\>(\ ++|:)(\S.*+)$#mU','blockquote');}public
 function
 pattern($parser,$matches){list(,$mMod,$mPrefix,$mContent)=$matches;$tx=$this->texy;$el=TexyHtml::el('blockquote');$mod=new
 TexyModifier($mMod);$mod->decorate($tx,$el);$content='';$spaces='';do{if($mPrefix===':'){$mod->cite=$tx->blockQuoteModule->citeLink($mContent);$content.="\n";}else{if($spaces==='')$spaces=max(1,strlen($mPrefix));$content.=$mContent."\n";}if(!$parser->next("#^>(?:|(\\ {1,$spaces}|:)(.*))()$#mA",$matches))break;list(,$mPrefix,$mContent)=$matches;}while(TRUE);$el->attrs['cite']=$mod->cite;$el->parseBlock($tx,$content,$parser->isIndented());if(!$el->count())return
@@ -584,7 +586,7 @@ TexyScriptModule
 extends
 TexyModule{public$handler;public$separator=',';public
 function
-__construct($texy){$this->texy=$texy;$texy->addHandler('script',array($this,'solve'));$texy->registerLinePattern(array($this,'pattern'),'#\{\{([^'.TEXY_MARK.']+)\}\}()#U','script');}public
+__construct($texy){$this->texy=$texy;$texy->addHandler('script',array($this,'solve'));$texy->registerLinePattern(array($this,'pattern'),'#\{\{((?:[^'.TEXY_MARK.'}]++|[}])+)\}\}()#U','script');}public
 function
 pattern($parser,$matches){list(,$mContent)=$matches;$cmd=trim($mContent);if($cmd==='')return
 FALSE;$args=$raw=NULL;if(preg_match('#^([a-z_][a-z0-9_-]*)\s*(?:\(([^()]*)\)|:(.*))$#iu',$cmd,$matches)){$cmd=$matches[1];$raw=isset($matches[3])?trim($matches[3]):trim($matches[2]);if($raw==='')$args=array();else$args=preg_split('#\s*'.preg_quote($this->separator,'#').'\s*#u',$raw);}if($this->handler){if(is_callable(array($this->handler,$cmd))){array_unshift($args,$parser);return
@@ -642,7 +644,7 @@ static$locales=array('cs'=>array('singleQuotes'=>array("\xe2\x80\x9a","\xe2\x80\
 function
 __construct($texy){$this->texy=$texy;$texy->registerPostLine(array($this,'postLine'),'typography');$texy->addHandler('beforeParse',array($this,'beforeParse'));}public
 function
-beforeParse($texy,&$text){if(isset(self::$locales[$this->locale]))$locale=self::$locales[$this->locale];else$locale=self::$locales['en'];$pairs=array('#(?<![.\x{2026}])\.{3,4}(?![.\x{2026}])#mu'=>"\xe2\x80\xa6",'#(?<=[\d ]|^)-(?=[\d ]|$)#'=>"\xe2\x80\x93",'#(?<=[^!*+,/:;<=>@\\\\_|-])--(?=[^!*+,/:;<=>@\\\\_|-])#'=>"\xe2\x80\x93",'#,-#'=>",\xe2\x80\x93",'#(?<!\d)(\d{1,2}\.) (\d{1,2}\.) (\d\d)#'=>"\$1\xc2\xa0\$2\xc2\xa0\$3",'#(?<!\d)(\d{1,2}\.) (\d{1,2}\.)#'=>"\$1\xc2\xa0\$2",'# --- #'=>"\xc2\xa0\xe2\x80\x94 ",'# ([\x{2013}\x{2014}])#u'=>"\xc2\xa0\$1",'# <-{1,2}> #'=>" \xe2\x86\x94 ",'#-{1,}> #'=>" \xe2\x86\x92 ",'# <-{1,}#'=>" \xe2\x86\x90 ",'#={1,}> #'=>" \xe2\x87\x92 ",'#\\+-#'=>"\xc2\xb1",'#(\d+)( ?)x\\2(?=\d)#'=>"\$1\xc3\x97",'#(?<=\d)x(?= |,|.|$)#m'=>"\xc3\x97",'#(\S ?)\(TM\)#i'=>"\$1\xe2\x84\xa2",'#(\S ?)\(R\)#i'=>"\$1\xc2\xae",'#\(C\)( ?\S)#i'=>"\xc2\xa9\$1",'#\(EUR\)#'=>"\xe2\x82\xac",'#(\d) (?=\d{3})#'=>"\$1\xc2\xa0",'#(?<=[^\s\x17])\s+([\x17-\x1F]+)(?=\s)#u'=>"\$1",'#(?<=\s)([\x17-\x1F]+)\s+#u'=>"\$1",'#(?<=.{50})\s+(?=[\x17-\x1F]*\S{1,6}[\x17-\x1F]*$)#us'=>"\xc2\xa0",'#(?<=^| |\.|,|-|\+|\x16|\(|\d\x{A0})([\x17-\x1F]*\d+\.?[\x17-\x1F]*)\s+(?=[\x17-\x1F]*[%'.TEXY_CHAR.'\x{b0}-\x{be}\x{2020}-\x{214f}])#mu'=>"\$1\xc2\xa0",'#(?<=^|[^0-9'.TEXY_CHAR.'])([\x17-\x1F]*[ksvzouiKSVZOUIA][\x17-\x1F]*)\s+(?=[\x17-\x1F]*[0-9'.TEXY_CHAR.'])#mus'=>"\$1\xc2\xa0",'#(?<!"|\w)"(?!\ |")(.+)(?<!\ |")"(?!")()#U'=>$locale['doubleQuotes'][0].'$1'.$locale['doubleQuotes'][1],'#(?<!\'|\w)\'(?!\ |\')(.+)(?<!\ |\')\'(?!\')()#Uu'=>$locale['singleQuotes'][0].'$1'.$locale['singleQuotes'][1]);$this->pattern=array_keys($pairs);$this->replace=array_values($pairs);}public
+beforeParse($texy,&$text){if(isset(self::$locales[$this->locale]))$locale=self::$locales[$this->locale];else$locale=self::$locales['en'];$pairs=array('#(?<![.\x{2026}])\.{3,4}(?![.\x{2026}])#mu'=>"\xe2\x80\xa6",'#(?<=[\d ]|^)-(?=[\d ]|$)#'=>"\xe2\x80\x93",'#(?<=[^!*+,/:;<=>@\\\\_|-])--(?=[^!*+,/:;<=>@\\\\_|-])#'=>"\xe2\x80\x93",'#,-#'=>",\xe2\x80\x93",'#(?<!\d)(\d{1,2}\.) (\d{1,2}\.) (\d\d)#'=>"\$1\xc2\xa0\$2\xc2\xa0\$3",'#(?<!\d)(\d{1,2}\.) (\d{1,2}\.)#'=>"\$1\xc2\xa0\$2",'# --- #'=>"\xc2\xa0\xe2\x80\x94 ",'# ([\x{2013}\x{2014}])#u'=>"\xc2\xa0\$1",'# <-{1,2}> #'=>" \xe2\x86\x94 ",'#-{1,}> #'=>" \xe2\x86\x92 ",'# <-{1,}#'=>" \xe2\x86\x90 ",'#={1,}> #'=>" \xe2\x87\x92 ",'#\\+-#'=>"\xc2\xb1",'#(\d++)( ?)x\\2(?=\d)#'=>"\$1\xc3\x97",'#(?<=\d)x(?= |,|.|$)#m'=>"\xc3\x97",'#(\S ?)\(TM\)#i'=>"\$1\xe2\x84\xa2",'#(\S ?)\(R\)#i'=>"\$1\xc2\xae",'#\(C\)( ?\S)#i'=>"\xc2\xa9\$1",'#\(EUR\)#'=>"\xe2\x82\xac",'#(\d) (?=\d{3})#'=>"\$1\xc2\xa0",'#(?<=[^\s\x17])\s++([\x17-\x1F]++)(?=\s)#u'=>"\$1",'#(?<=\s)([\x17-\x1F]++)\s++#u'=>"\$1",'#(?<=.{50})\s++(?=[\x17-\x1F]*\S{1,6}[\x17-\x1F]*$)#us'=>"\xc2\xa0",'#(?<=^| |\.|,|-|\+|\x16|\(|\d\x{A0})([\x17-\x1F]*\d++\.?[\x17-\x1F]*)\s++(?=[\x17-\x1F]*[%'.TEXY_CHAR.'\x{b0}-\x{be}\x{2020}-\x{214f}])#mu'=>"\$1\xc2\xa0",'#(?<=^|[^0-9'.TEXY_CHAR.'])([\x17-\x1F]*[ksvzouiKSVZOUIA][\x17-\x1F]*)\s++(?=[\x17-\x1F]*[0-9'.TEXY_CHAR.'])#mus'=>"\$1\xc2\xa0",'#(?<!"|\w)"(?!\ |")((?:[^"]++|")+)(?<!\ |")"(?!["'.TEXY_CHAR.'])()#Uu'=>$locale['doubleQuotes'][0].'$1'.$locale['doubleQuotes'][1],'#(?<!\'|\w)\'(?!\ |\')((?:[^\']++|\')+)(?<!\ |\')\'(?![\''.TEXY_CHAR.'])()#Uu'=>$locale['singleQuotes'][0].'$1'.$locale['singleQuotes'][1]);$this->pattern=array_keys($pairs);$this->replace=array_values($pairs);}public
 function
 postLine($text,$preserveSpaces=FALSE){if(!$preserveSpaces){$text=preg_replace('# {2,}#',' ',$text);}return
 preg_replace($this->pattern,$this->replace,$text);}}final
@@ -653,7 +655,7 @@ TexyModule{public$indent=TRUE;public$baseIndent=0;public$lineWrap=80;public$remo
 function
 __construct($texy){$this->texy=$texy;$texy->addHandler('postProcess',array($this,'postProcess'));}public
 function
-postProcess($texy,&$s){$this->space=$this->baseIndent;$this->tagStack=array();$this->tagUsed=array();$this->xml=$texy->getOutputMode()&Texy::XML;$this->baseDTD=$texy->dtd['div'][1]+$texy->dtd['html'][1]+$texy->dtd['body'][1]+array('html'=>1);$s=preg_replace_callback('#(.*)<(?:(!--.*--)|(/?)([a-z][a-z0-9._:-]*)(|[ \n].*)\s*(/?))>()#Uis',array($this,'cb'),$s.'</end/>');foreach($this->tagStack
+postProcess($texy,&$s){$this->space=$this->baseIndent;$this->tagStack=array();$this->tagUsed=array();$this->xml=$texy->getOutputMode()&Texy::XML;$this->baseDTD=$texy->dtd['div'][1]+$texy->dtd['html'][1]+$texy->dtd['body'][1]+array('html'=>1);$s=preg_replace_callback('#([^<]*+)<(?:(!--.*--)|(/?)([a-z][a-z0-9._:-]*)(|[ \n].*)\s*(/?))>()#Uis',array($this,'cb'),$s.'</end/>');foreach($this->tagStack
 as$item)$s.=$item['close'];$s=preg_replace("#[\t ]+(\n|\r|$)#",'$1',$s);$s=str_replace("\r\r","\n",$s);$s=strtr($s,"\r","\n");$s=preg_replace("#\\x07 *#",'',$s);$s=preg_replace("#\\t? *\\x08#",'',$s);if($this->lineWrap>0){$s=preg_replace_callback('#^(\t*)(.*)$#m',array($this,'wrap'),$s);}if(!$this->xml&&$this->removeOptional){$s=preg_replace('#\\s*</(colgroup|dd|dt|li|option|p|td|tfoot|th|thead|tr)>#u','',$s);}}private
 function
 cb($matches){list(,$mText,$mComment,$mEnd,$mTag,$mAttr,$mEmpty)=$matches;$s='';if($mText!==''){$item=reset($this->tagStack);if($item&&!isset($item['dtdContent']['%DATA'])){}elseif(!empty($this->tagUsed['pre'])||!empty($this->tagUsed['textarea'])||!empty($this->tagUsed['script']))$s=Texy::freezeSpaces($mText);else$s=preg_replace('#[ \n]+#',' ',$mText);}if($mComment)return$s.'<'.Texy::freezeSpaces($mComment).'>';$mEmpty=$mEmpty||isset(TexyHtml::$emptyElements[$mTag]);if($mEmpty&&$mEnd)return$s;if($mEnd){if(empty($this->tagUsed[$mTag]))return$s;$tmp=array();$back=TRUE;foreach($this->tagStack
@@ -674,15 +676,6 @@ extends
 Exception{}}if(!class_exists('UnexpectedValueException',FALSE)){class
 UnexpectedValueException
 extends
-RuntimeException{}}if(!class_exists('NotSupportedException',FALSE)){class
-NotSupportedException
-extends
-LogicException{}}if(!class_exists('MemberAccessException',FALSE)){class
-MemberAccessException
-extends
-LogicException{}}if(!class_exists('InvalidStateException',FALSE)){class
-InvalidStateException
-extends
 RuntimeException{}}define('TEXY_ALL',TRUE);define('TEXY_NONE',FALSE);define('TEXY_CONTENT_MARKUP',"\x17");define('TEXY_CONTENT_REPLACED',"\x16");define('TEXY_CONTENT_TEXTUAL',"\x15");define('TEXY_CONTENT_BLOCK',"\x14");class
 Texy
 extends
@@ -690,7 +683,7 @@ TexyObject{const
 ALL=TRUE;const
 NONE=FALSE;const
 VERSION=TEXY_VERSION;const
-REVISION='9338a11 released on 2010-05-20';const
+REVISION='01f330d released on 2013-07-15';const
 CONTENT_MARKUP="\x17";const
 CONTENT_REPLACED="\x16";const
 CONTENT_TEXTUAL="\x15";const
@@ -756,7 +749,7 @@ InvalidArgumentException("Handler '$textual' is not ".($able?'callable.':'valid 
 function
 process($text,$singleLine=FALSE){if($this->processing){throw
 new
-InvalidStateException('Processing is in progress yet.');}$this->marks=array();$this->processing=TRUE;if(is_array($this->allowedClasses))$this->_classes=array_flip($this->allowedClasses);else$this->_classes=$this->allowedClasses;if(is_array($this->allowedStyles))$this->_styles=array_flip($this->allowedStyles);else$this->_styles=$this->allowedStyles;$text=TexyUtf::toUtf($text,$this->encoding);if($this->removeSoftHyphens){$text=str_replace("\xC2\xAD",'',$text);}$text=self::normalize($text);$this->tabWidth=max(1,(int)$this->tabWidth);while(strpos($text,"\t")!==FALSE){$text=preg_replace_callback('#^(.*)\t#mU',array($this,'tabCb'),$text);}$this->invokeHandlers('beforeParse',array($this,&$text,$singleLine));$this->_linePatterns=$this->linePatterns;$this->_blockPatterns=$this->blockPatterns;foreach($this->_linePatterns
+RuntimeException('Processing is in progress yet.');}$this->marks=array();$this->processing=TRUE;if(is_array($this->allowedClasses))$this->_classes=array_flip($this->allowedClasses);else$this->_classes=$this->allowedClasses;if(is_array($this->allowedStyles))$this->_styles=array_flip($this->allowedStyles);else$this->_styles=$this->allowedStyles;$text=TexyUtf::toUtf($text,$this->encoding);if($this->removeSoftHyphens){$text=str_replace("\xC2\xAD",'',$text);}$text=self::normalize($text);$this->tabWidth=max(1,(int)$this->tabWidth);while(strpos($text,"\t")!==FALSE){$text=preg_replace_callback('#^([^\t\n]*+)\t#mU',array($this,'tabCb'),$text);}$this->invokeHandlers('beforeParse',array($this,&$text,$singleLine));$this->_linePatterns=$this->linePatterns;$this->_blockPatterns=$this->blockPatterns;foreach($this->_linePatterns
 as$name=>$foo){if(empty($this->allowed[$name]))unset($this->_linePatterns[$name]);}foreach($this->_blockPatterns
 as$name=>$foo){if(empty($this->allowed[$name]))unset($this->_blockPatterns[$name]);}$this->DOM=TexyHtml::el();if($singleLine){$this->DOM->parseLine($this,$text);}else{$this->DOM->parseBlock($this,$text);}$this->invokeHandlers('afterParse',array($this,$this->DOM,$singleLine));$html=$this->DOM->toHtml($this);if(self::$advertisingNotice){$html.="\n<!-- by Texy2! -->";if(self::$advertisingNotice==='once'){self::$advertisingNotice=FALSE;}}$this->processing=FALSE;return
 TexyUtf::utf2html($html,$this->encoding);}public
@@ -768,7 +761,7 @@ TexyUtf::utf2html($text,$this->encoding);}public
 function
 toText(){if(!$this->DOM){throw
 new
-InvalidStateException('Call $texy->process() first.');}return
+RuntimeException('Call $texy->process() first.');}return
 TexyUtf::utfTo($this->DOM->toText($this),$this->encoding);}final
 public
 function
@@ -865,4 +858,4 @@ public
 function
 __clone(){throw
 new
-NotSupportedException('Clone is not supported.');}}
+Exception('Clone is not supported.');}}
