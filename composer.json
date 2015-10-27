@@ -17,15 +17,13 @@
 		}
 	],
 	"require": {
-		"php": ">=5.2.0"
+		"php": ">=5.4.4"
 	},
 	"replace": {
 		"dg/texy": "self.version",
 		"texy/texy": "self.version"
 	},
 	"autoload": {
-		"psr-4": {
-			"": "src/"
-		}
+		"files": ["src/texy.phar"]
 	}
 }
