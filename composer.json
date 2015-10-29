@@ -19,6 +19,9 @@
 	"require": {
 		"php": ">=5.4.4"
 	},
+	"require-dev": {
+		"nette/tester": "~1.5"
+	},
 	"replace": {
 		"dg/texy": "self.version",
 		"texy/texy": "self.version"
